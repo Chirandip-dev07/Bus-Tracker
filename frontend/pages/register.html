@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Where Is My Bus</title>
+    <link rel="stylesheet" href="../assets/css/login.css">
+    <link rel="stylesheet" href="../assets/css/register.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <!-- Logo Area -->
+            <div class="logo-area">
+                <div class="logo-circle">
+                    <span>🚌</span>
+                </div>
+                <h1 class="app-name">Where Is My Bus</h1>
+                <p class="tagline">Never miss your bus again</p>
+            </div>
+
+            <!-- Registration Steps Container -->
+            <div id="registrationSteps">
+                <!-- Step 1: Basic Info & Role Selection -->
+                <div class="step active" id="step-basic">
+                    <h2>Create Account</h2>
+                    <p class="tagline">Create your account to start tracking buses in real-time.</p>
+                    <form id="basicInfoForm" novalidate>
+                        <div class="input-group">
+                            <label for="name">Full Name</label>
+                            <input type="text" id="name" placeholder="John Doe" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" placeholder="john@example.com" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" placeholder="9876543210" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="password">Password</label>
+                            <div class="password-wrapper">
+                                <input type="password" id="password" placeholder="Bus@1234" required>
+                                <button type="button" class="toggle-password" id="togglePassword">👁️</button>
+                            </div>
+                            <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+                            <div class="strength-text" id="strengthText">Too weak</div>
+                        </div>
+                        <div class="input-group">
+                            <label for="confirmPassword">Confirm Password</label>
+                            <div class="password-wrapper">
+                                <input type="password" id="confirmPassword" placeholder="Re-enter password" required>
+                                <button type="button" class="toggle-password" id="toggleConfirmPassword">👁️</button>
+                            </div>
+                            <span class="error-message" id="confirmError"></span>
+                        </div>
+
+                        <div class="role-selection">
+                            <label>Register as:</label>
+                            <div class="role-options">
+                                <label class="role-option">
+                                    <input type="radio" name="role" value="passenger" checked>
+                                    <span class="role-label">🚶 Passenger</span>
+                                </label>
+                                <label class="role-option">
+                                    <input type="radio" name="role" value="driver">
+                                    <span class="role-label">🚌 Driver</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Driver-specific fields (hidden by default) -->
+                        <div id="driverFields" style="display: none;">
+                            <div class="input-group">
+                                <label for="license">Driving License Number</label>
+                                <input type="text" id="license" placeholder="WB12345678">
+                            </div>
+                            <div class="input-group">
+                                <label for="licenseExpiry">License Expiry Date</label>
+                                <input type="date" id="licenseExpiry">
+                            </div>
+                            <div class="input-group">
+                                <label for="experience">Years of Experience</label>
+                                <input type="number" id="experience" min="0" placeholder="5">
+                            </div>
+                            <div class="input-group">
+                                <label for="operator">Bus Operator Name (Optional)</label>
+                                <input type="text" id="operator" placeholder="Private Operator">
+                            </div>
+                            <div class="input-group">
+                                <label for="routeSelect">Select Route</label>
+                                <select id="routeSelect">
+                                    <option value="">-- Choose a route --</option>
+                                </select>
+                                <div id="routeInfoCard" class="route-info-card" style="display:none;"></div>
+                            </div>
+                        </div>
+
+                        <button type="button" class="login-btn" id="nextToOtpBtn">Continue</button>
+                    </form>
+                    <p class="extra-links">Already have an account? <a href="login.html">Login</a></p>
+                </div>
+
+                <!-- Step 2: Email OTP Verification -->
+                <div class="step" id="step-email-otp">
+                    <h2>Verify Email</h2>
+                    <p>A verification code has been sent to your email.</p>
+                    <div class="input-group">
+                        <input type="text" id="emailOtpInput" class="otp-input" maxlength="6" placeholder="000000">
+                    </div>
+                    <button class="login-btn" id="verifyEmailOtpBtn">Verify Email</button>
+                    <button class="resend-link" id="resendEmailOtpBtn" disabled>Resend OTP<span id="resendEmailTimer"></span></button>
+                    <div id="emailOtpError" class="error-message"></div>
+                </div>
+
+                <!-- Step 3: Phone OTP Verification -->
+                <div class="step" id="step-phone-otp">
+                    <h2>Verify Phone</h2>
+                    <p>A verification code has been sent to your phone.</p>
+                    <div class="input-group">
+                        <input type="text" id="phoneOtpInput" class="otp-input" maxlength="6" placeholder="000000">
+                    </div>
+                    <button class="login-btn" id="verifyPhoneOtpBtn">Verify Phone</button>
+                    <button class="resend-link" id="resendPhoneOtpBtn" disabled>Resend OTP<span id="resendPhoneTimer"></span></button>
+                    <div id="phoneOtpError" class="error-message"></div>
+                </div>
+
+                <!-- Step 4: Finalize / Processing -->
+                <div class="step" id="step-processing">
+                    <h2>Creating Account...</h2>
+                    <div class="spinner" style="margin: 1rem auto;"></div>
+                </div>
+
+                <!-- Step 5: Success (Passenger) -->
+                <div class="step" id="step-success-passenger">
+                    <div class="success-icon">✅</div>
+                    <h2>Account Created!</h2>
+                    <p>Your account has been created successfully.</p>
+                    <button class="login-btn" id="gotoLoginPassenger">Go to Login</button>
+                    <p class="redirect-text">Redirecting in <span id="passengerRedirectTimer">3</span>s</p>
+                </div>
+
+                <!-- Step 5b: Success (Driver) -->
+                <div class="step" id="step-success-driver">
+                    <div class="success-icon">📋</div>
+                    <h2>Application Submitted</h2>
+                    <p>Your driver application has been submitted for review.</p>
+                    <div class="application-status">
+                        <p><strong>Application ID:</strong> <span id="appIdDisplay"></span></p>
+                        <p><strong>Status:</strong> Pending Approval</p>
+                    </div>
+                    <p>An administrator will review your application before you can access the Driver Dashboard.</p>
+                    <button class="login-btn" id="gotoLoginDriver">Back to Login</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../assets/js/register.js"></script>
+</body>
+</html>

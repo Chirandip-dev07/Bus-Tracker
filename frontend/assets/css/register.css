@@ -1,0 +1,192 @@
+/* Step containers */
+.step { display: none; }
+.step.active { display: block; }
+
+/* Role selection */
+.role-selection {
+    margin: 1.25rem 0;
+    text-align: left;
+}
+.role-selection > label {
+    display: block;
+    margin-bottom: 0.4rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text);
+}
+.role-options {
+    display: flex;
+    gap: 1.5rem;
+}
+.role-option {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    cursor: pointer;
+    font-size: 0.95rem;
+}
+.role-option input[type="radio"] {
+    accent-color: var(--primary);
+}
+
+/* Route info card */
+.route-info-card {
+    background: #f1f5f9;
+    border-radius: var(--input-radius);
+    padding: 0.75rem;
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--text);
+    border-left: 4px solid var(--primary);
+}
+.route-info-card p {
+    margin: 0.25rem 0;
+}
+
+/* OTP input */
+.otp-input {
+    letter-spacing: 0.5em;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 600;
+    padding: 0.5rem;
+}
+
+/* Resend link */
+.resend-link {
+    background: none;
+    border: none;
+    color: var(--primary);
+    cursor: pointer;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    display: inline-block;
+}
+.resend-link:disabled {
+    color: #94a3b8;
+    cursor: not-allowed;
+}
+
+/* Application status */
+.application-status {
+    background: #f0f9ff;
+    border: 1px solid #bae6fd;
+    border-radius: var(--input-radius);
+    padding: 0.75rem;
+    margin: 1rem 0;
+    font-size: 0.9rem;
+    text-align: left;
+}
+
+/* Success icon */
+.success-icon {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+    animation: scaleIn 0.4s ease;
+}
+@keyframes scaleIn {
+    from { transform: scale(0.5); opacity: 0; }
+    to   { transform: scale(1); opacity: 1; }
+}
+
+.redirect-text {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    margin-top: 0.5rem;
+}
+
+/* Strength bar (same as forgot password) */
+.strength-bar {
+    height: 4px;
+    border-radius: 2px;
+    margin-top: 8px;
+    background: #e2e8f0;
+    overflow: hidden;
+}
+.strength-fill {
+    height: 100%;
+    width: 0%;
+    transition: width 0.3s, background 0.3s;
+}
+.strength-text {
+    font-size: 0.8rem;
+    margin-top: 4px;
+    color: #64748b;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+    .role-options {
+        gap: 1.25rem;
+    }
+
+    .otp-input {
+        font-size: 1.3rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .role-options {
+        gap: 1rem;
+    }
+
+    .role-option {
+        font-size: 0.9rem;
+    }
+
+    .route-info-card {
+        font-size: 0.85rem;
+    }
+
+    .otp-input {
+        font-size: 1.2rem;
+        padding: 0.6rem;
+    }
+
+    .resend-link {
+        font-size: 0.85rem;
+    }
+
+    .application-status {
+        padding: 0.6rem;
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .role-selection {
+        margin: 1rem 0;
+    }
+
+    .role-options {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .role-option {
+        font-size: 0.85rem;
+    }
+
+    .success-icon {
+        font-size: 2.5rem;
+    }
+
+    .otp-input {
+        font-size: 1.1rem;
+        padding: 0.5rem;
+    }
+
+    .strength-text {
+        font-size: 0.75rem;
+    }
+
+    .redirect-text {
+        font-size: 0.8rem;
+    }
+
+    .application-status {
+        padding: 0.5rem;
+        font-size: 0.8rem;
+        margin: 0.75rem 0;
+    }
+}

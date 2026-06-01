@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Search Bus - Where Is My Bus</title>
+    <link rel="stylesheet" href="../assets/css/login.css">
+    <link rel="stylesheet" href="../assets/css/passenger-dashboard.css">
+    <link rel="stylesheet" href="../assets/css/passenger-profile-menu.css">
+</head>
+<body>
+    <div class="passenger-app">
+        <header class="app-header">
+            <div class="header-left">
+                <div class="logo-area">
+                    <span class="logo-icon">🚌</span>
+                    <div>
+                        <h1 class="app-title">Search Your Bus</h1>
+                        <p class="app-subtitle">Find the best route between two stops</p>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="header-actions">
+                    <button id="logoutBtn" class="header-logout-btn">Logout</button>
+                    <div id="profile-menu"></div>
+                </div>
+            </div>
+        </header>
+
+        <main class="dashboard-layout">
+            <section class="dashboard-main">
+                <div class="search-panel card">
+                    <div class="panel-heading">
+                        <span class="panel-label">Plan your journey</span>
+                        <h2>Quick route search</h2>
+                        <p class="panel-description">Use your current location or select a stop manually to find the best available route.</p>
+                    </div>
+
+                    <div class="source-selection">
+                        <label class="radio-option">
+                            <input type="radio" name="sourceType" value="detect" checked>
+                            <span class="radio-custom"></span>
+                            Detect Current Location
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="sourceType" value="manual">
+                            <span class="radio-custom"></span>
+                            Select Manually
+                        </label>
+                    </div>
+
+                    <div class="input-group" id="manualSourceGroup" style="display:none;">
+                        <label for="sourceInput">Source Stop</label>
+                        <div class="autocomplete-wrapper">
+                            <input type="text" id="sourceInput" placeholder="Search stop..." autocomplete="off">
+                            <div class="suggestions" id="sourceSuggestions"></div>
+                        </div>
+                    </div>
+
+                    <div class="input-group" id="detectSourceGroup">
+                        <button id="detectLocationBtn" class="primary-btn outline">📍 Detect My Location</button>
+                        <div id="detectedResult" style="display:none; margin-top: 0.5rem;">
+                            <span class="detected-stop">Nearest Stop: <strong id="nearestStopName"></strong></span>
+                            <input type="hidden" id="detectedSource" value="">
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="destinationInput">Destination Stop</label>
+                        <div class="autocomplete-wrapper">
+                            <input type="text" id="destinationInput" placeholder="Search destination..." autocomplete="off">
+                            <div class="suggestions" id="destinationSuggestions"></div>
+                        </div>
+                    </div>
+
+                    <button id="searchBtn" class="primary-btn large-btn" disabled>Find Routes</button>
+                    <div id="searchError" class="error-msg"></div>
+                </div>
+
+                <div id="resultsContainer" class="results-container"></div>
+            </section>
+
+            <aside class="dashboard-side">
+                
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <h3>🚌 Available Routes</h3>
+                    </div>
+                    <ul class="info-list">
+                        <li><strong>77A</strong> • Batanagar → Esplanade</li>
+                        <li><strong>259</strong> • Akra Bazar → Howrah Station</li>
+                        <li><strong>S12</strong> • Howrah Station → New Town</li>
+                        <li><strong>AC12</strong> • Howrah Station → New Town (AC)</li>
+                    </ul>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <h3>💡 Quick Tips</h3>
+                    </div>
+                    <ul class="info-list">
+                        <li>Enable location access to automatically detect your nearest bus stop.</li>
+                        <li>Use "View Live Buses" to track currently running buses.</li>
+                        <li>Use "View Bus Schedule" to see the complete timetable.</li>
+                        <li>Track buses in real-time with stop-wise ETA updates.</li>
+                    </ul>
+                </div>
+
+            </aside>
+        </main>
+    </div>
+
+    
+    <!-- Live Buses Modal -->
+<div id="liveBusesModal" class="modal-overlay" style="display:none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Live Buses</h2>
+            <button id="closeModalBtn" class="close-btn">&times;</button>
+        </div>
+        <div id="liveBusesContainer" class="live-buses-list"></div>
+    </div>
+
+    <script src="../assets/js/passenger-dashboard.js"></script>
+    <script src="../assets/js/passenger-profile-menu.js"></script>
+</div>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Live Tracking - Where Is My Bus</title>
+    <link rel="stylesheet" href="../assets/css/login.css">
+    <link rel="stylesheet" href="../assets/css/passenger-tracking.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="../assets/css/passenger-profile-menu.css">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body>
+    <div class="tracking-layout">
+        <!-- Left Panel: Route Info, Status, ETA, Timeline -->
+        <main class="timeline-panel" id="timelinePanel">
+            <header class="tracking-header">
+                <div class="header-left">
+                    <button id="backBtn" class="back-btn">← Back to Search</button>
+                    <div class="route-head">
+                        <div class="route-short" id="routeShort">--</div>
+                        <div class="route-title-text"><span id="routeTitle">Live Tracking</span></div>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <div class="status-badge" id="statusBadge">--</div>
+                    <button id="logoutBtn" class="header-logout-btn">Logout</button>
+                    <div id="profile-menu"></div>
+                </div>
+            </header>
+
+            <!-- Route Info Card -->
+            <div class="card route-info-card">
+                <div class="route-number-big" id="routeNumberBig">--</div>
+                <div class="route-meta">
+                    <div class="route-direction">
+                        <span id="routeSource">--</span>
+                        <span class="arrow">→</span>
+                        <span id="routeDest">--</span>
+                    </div>
+                    <div class="route-properties">
+                        <span class="prop">Direction: <strong id="directionBadge">UP</strong></span>
+                        <span class="prop">Bus Type: <strong id="busType">--</strong></span>
+                        <span class="prop">Ownership: <strong id="ownership">--</strong></span>
+                        <span class="prop">Fare: <strong id="fare">--</strong></span>
+                        <span class="prop">Duration: <strong id="duration">--</strong></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bus Status Card -->
+            <div class="card status-card" id="statusCard">
+                <div class="status-row">
+                    <span class="status-indicator" id="statusIndicator">🟢</span>
+                    <span id="statusText">Running</span>
+                </div>
+                <div class="status-details">
+                    <div><strong>Current Stop:</strong> <span id="currentStop">--</span></div>
+                    <div><strong>Next Stop:</strong> <span id="nextStop">--</span></div>
+                    <div><strong>Speed:</strong> <span id="speedVal">0</span> km/h</div>
+                    <div><strong>Delay:</strong> <span id="delayVal">0</span> min</div>
+                </div>
+            </div>
+
+            <!-- Passenger Stop ETA Card -->
+            <div class="card passenger-eta-card" id="passengerEtaCard">
+                <div class="card-header">Your Boarding Stop</div>
+                <div class="passenger-stop-name" id="passengerStopName">--</div>
+                <div class="passenger-arrival">
+                    <span>Bus arrives in <strong id="passengerEtaMinutes">--</strong></span>
+                    <span class="eta-time" id="passengerEtaTime">--</span>
+                </div>
+                <div class="passenger-destination">
+                    Destination: <span id="passengerDestStop">--</span>
+                </div>
+            </div>
+
+            <!-- Upcoming Stops Timeline -->
+            <div class="card timeline-card">
+                <div class="card-header">Route Timeline</div>
+                <div class="timeline" id="timelineContainer">
+                    <!-- filled dynamically -->
+                </div>
+            </div>
+        </main>
+
+        <!-- Map Panel (sticky) -->
+        <aside class="map-panel" id="mapPanel">
+            <div id="trackingMap" class="map-container"></div>
+            <div class="map-controls">
+                <button id="centerBusBtn" title="Center on bus">📍</button>
+                <button id="centerMeBtn" title="Center on me">🧑</button>
+                <button id="fitRouteBtn" title="Fit route">↔️</button>
+            </div>
+        </aside>
+    </div>
+
+    <script src="../assets/js/passenger-tracking.js"></script>
+    <script src="../assets/js/passenger-profile-menu.js"></script>
+</body>
+</html>

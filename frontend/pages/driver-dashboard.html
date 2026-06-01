@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Driver Dashboard - Where Is My Bus</title>
+    <link rel="stylesheet" href="../assets/css/login.css">
+    <link rel="stylesheet" href="../assets/css/driver-dashboard.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Fixed Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-circle" style="width:40px;height:40px;font-size:1.2rem;">🚌</div>
+                <span class="app-title">Where Is My Bus</span>
+            </div>
+            <div class="sidebar-user">
+                <div class="user-avatar">👤</div>
+                <div class="user-info">
+                    <span class="user-name" id="sidebarName">Loading...</span>
+                    <span class="user-role">Driver</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-section="home">🏠 Dashboard</a>
+                <a href="#" class="nav-item" data-section="history">📋 Trip History</a>
+                <a href="#" class="nav-item" data-section="profile">👤 Profile</a>
+                <a href="#" class="nav-item" id="logoutSidebar">🚪 Logout</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-area">
+            <!-- Top Header -->
+            <header class="top-header">
+                <div class="welcome-msg">
+                    <h2>Welcome Back, <span id="headerName">Driver</span></h2>
+                    <p id="headerDateTime" class="datetime"></p>
+                </div>
+                <div class="header-status">
+                    <span class="status-badge" id="headerStatus">Online</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+            </header>
+
+            <!-- Dynamic screens -->
+            <div id="screenContainer">
+                <!-- Dashboard Home Screen (default) -->
+                <section id="homeScreen" class="screen active">
+                    <!-- Skeleton loader will be replaced by real content -->
+                    <div class="skeleton-wrapper" id="homeSkeleton">
+                        <div class="skeleton-card"></div>
+                        <div class="skeleton-card"></div>
+                        <div class="skeleton-card"></div>
+                        <div class="skeleton-card"></div>
+                        <div class="skeleton-start-trip"></div>
+                    </div>
+                    <div id="homeContent" style="display:none;">
+                        <!-- Top Row Cards -->
+                        <div class="cards-row">
+                            <div class="card route-card">
+                                <div class="card-header">Assigned Route</div>
+                                <div class="route-number" id="routeNumber">--</div>
+                                <div class="route-direction">
+                                    <span id="routeSource">--</span>
+                                    <span class="arrow">↓</span>
+                                    <span id="routeDest">--</span>
+                                </div>
+                                <div class="route-details">
+                                    <div><strong>Bus Type:</strong> <span id="routeBusType">--</span></div>
+                                    <div><strong>Ownership:</strong> <span id="routeOwnership">--</span></div>
+                                </div>
+                            </div>
+                            <div class="card status-card">
+                                <div class="card-header">Current Status</div>
+                                <div class="status-value" id="accountStatus">--</div>
+                                <div class="sub-text" id="tripStatusText">No active trip</div>
+                            </div>
+                            <div class="card trips-card">
+                                <div class="card-header">Today's Trips</div>
+                                <div class="big-number" id="todaysTrips">0</div>
+                                <div class="sub-text">trips completed</div>
+                            </div>
+                            <div class="card account-card">
+                                <div class="card-header">Account</div>
+                                <div class="account-name" id="accountName">--</div>
+                                <div class="sub-text" id="accountEmail">--</div>
+                            </div>
+                        </div>
+
+                        <!-- Start Trip Section -->
+                        <div class="start-trip-card card">
+                            <div class="trip-details">
+                                <div class="trip-route"><strong>Route:</strong> <span id="tripRoute">--</span></div>
+                                <div class="trip-from-to"><span id="tripSource">--</span> → <span id="tripDest">--</span></div>
+                                <div class="trip-status-badge" id="tripBadge">No Active Trip</div>
+                            </div>
+                            <button id="startTripBtn" class="primary-btn start-trip-btn" disabled>
+                                <span class="btn-text">START TRIP</span>
+                                <span class="spinner" style="display:none;"></span>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Direction Selection Modal -->
+                    <div id="directionModal" class="modal-overlay" style="display:none;">
+                        <div class="modal-card">
+                            <h3>Select Trip Starting Point</h3>
+                            <p>Choose the stop where you will begin this trip.</p>
+                            <div class="direction-options">
+                                <button id="directionUpBtn" class="direction-btn">
+                                    <span class="stop-name" id="upStopName">--</span>
+                                    <small id="upTowards">Towards --</small>
+                                </button>
+                                <button id="directionDownBtn" class="direction-btn">
+                                    <span class="stop-name" id="downStopName">--</span>
+                                    <small id="downTowards">Towards --</small>
+                                </button>
+                            </div>
+                            <button id="cancelDirectionBtn" class="secondary-btn">Cancel</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Live Trip Screen -->
+                <section id="liveScreen" class="screen">
+                    <div class="live-topbar">
+                        <span id="liveRouteText">Route: --</span>
+                        <span class="live-badge" id="liveBadge">Running</span>
+                    </div>
+                    <div id="liveMap" class="map-container"></div>
+                    <div class="live-bottom-panel">
+                        <div class="stop-progress" id="stopProgress"></div>
+                        <div class="live-stats">
+                            <div class="stat"><strong>Speed:</strong> <span id="liveSpeed">0</span> km/h</div>
+                            <div class="stat"><strong>Duration:</strong> <span id="liveDuration">00:00</span></div>
+                            <div class="stat"><strong>Delay:</strong> <span id="liveDelay">0</span> min</div>
+                        </div>
+                        <button id="endTripBtn" class="danger-btn large-btn">END TRIP</button>
+                    </div>
+                </section>
+
+                <!-- Trip History Screen -->
+                <section id="historyScreen" class="screen">
+                    <h3>Trip History</h3>
+                    <div class="skeleton-wrapper" id="historySkeleton"><div class="skeleton-list"></div></div>
+                    <div id="historyContent" style="display:none;"></div>
+                </section>
+
+                <!-- Profile Screen -->
+                <section id="profileScreen" class="screen">
+                    <h3>Profile</h3>
+                    <div class="skeleton-wrapper" id="profileSkeleton"><div class="skeleton-card"></div></div>
+                    <div id="profileContent" style="display:none;"></div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script src="../assets/js/driver-dashboard.js"></script>
+</body>
+</html>

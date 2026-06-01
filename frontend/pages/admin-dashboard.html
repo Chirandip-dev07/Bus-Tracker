@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Where Is My Bus</title>
+    <link rel="stylesheet" href="../assets/css/login.css">
+    <link rel="stylesheet" href="../assets/css/admin-dashboard.css">
+    <!-- Leaflet CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-circle" style="width:40px;height:40px;font-size:1.2rem;margin:0;">🚌</div>
+                <span>Admin Panel</span>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-section="dashboard"><span class="icon">📊</span> Dashboard</a>
+                <a href="#" class="nav-item" data-section="driver-applications"><span class="icon">📋</span> Driver Applications</a>
+                <a href="#" class="nav-item" data-section="live-buses"><span class="icon">🚍</span> Live Buses</a>
+                <a href="#" class="nav-item" data-section="routes"><span class="icon">🛣️</span> Routes</a>
+                <a href="#" class="nav-item" data-section="trips"><span class="icon">🗺️</span> Trips</a>
+                <a href="#" class="nav-item" data-section="users"><span class="icon">👥</span> Users</a>
+                <a href="#" class="nav-item" data-section="buses"><span class="icon">🚌</span> Buses</a>
+                <a href="#" id="logoutBtn" class="nav-item"><span class="icon">🔒</span> Logout</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="topbar">
+                <button id="sidebarToggle" class="toggle-btn">☰</button>
+                <div class="topbar-right">
+                    <span id="adminName"></span>
+                    <span id="currentDateTime"></span>
+                </div>
+            </header>
+
+            <!-- Dynamic sections -->
+            <div class="content-area" id="contentArea"></div>
+        </main>
+    </div>
+
+    <!-- Templates for dynamic rendering -->
+    <template id="template-stats">
+        <div class="stats-grid">
+            <div class="stat-card"><h3>Total Passengers</h3><p class="stat-number">{{totalPassengers}}</p></div>
+            <div class="stat-card"><h3>Total Drivers</h3><p class="stat-number">{{totalDrivers}}</p></div>
+            <div class="stat-card"><h3>Pending Applications</h3><p class="stat-number">{{pendingApplications}}</p></div>
+            <div class="stat-card"><h3>Total Routes</h3><p class="stat-number">{{totalRoutes}}</p></div>
+            <div class="stat-card"><h3>Total Buses</h3><p class="stat-number">{{totalBuses}}</p></div>
+            <div class="stat-card"><h3>Live Buses</h3><p class="stat-number">{{liveBuses}}</p></div>
+            <div class="stat-card"><h3>Trips Today</h3><p class="stat-number">{{tripsToday}}</p></div>
+        </div>
+    </template>
+
+    <script src="../assets/js/admin-dashboard.js"></script>
+</body>
+</html>

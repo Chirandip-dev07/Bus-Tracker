@@ -1,0 +1,446 @@
+:root {
+    --primary: #2563EB;
+    --success: #10B981;
+    --warning: #F59E0B;
+    --danger: #EF4444;
+    --bg: #F8FAFC;
+    --card-bg: #FFFFFF;
+    --text: #1E293B;
+    --text-secondary: #64748B;
+    --border: #E2E8F0;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+    --shadow: 0 4px 12px rgba(0,0,0,0.08);
+    --radius: 14px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); }
+
+.tracking-layout {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+    gap: 0;
+}
+
+/* Timeline Panel */
+.timeline-panel {
+    flex: 0 0 40%;
+    max-width: 40%;
+    min-width: 320px;
+    overflow-y: auto;
+    padding: 1rem 1.5rem;
+    background: var(--bg);
+    height: 100vh;
+}
+
+@media (max-width: 1440px) {
+    .timeline-panel {
+        flex: 0 0 42%;
+        max-width: 42%;
+        padding: 1rem 1.25rem;
+    }
+}
+
+@media (max-width: 1024px) {
+    .timeline-panel {
+        flex: 0 0 45%;
+        max-width: 45%;
+        padding: 0.85rem 1rem;
+    }
+
+    .tracking-header {
+        gap: 0.75rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .tracking-header h2 {
+        font-size: 1.15rem;
+    }
+
+    .card {
+        padding: 1.1rem;
+        margin-bottom: 0.9rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .tracking-layout {
+        flex-direction: column;
+        overflow-y: auto;
+    }
+
+    .timeline-panel {
+        flex: 0 0 auto;
+        max-width: 100%;
+        min-width: auto;
+        height: auto;
+        padding: 1rem 0.75rem;
+        overflow-y: visible;
+    }
+
+    #leafletMap {
+        flex: 0 0 300px;
+        height: 300px;
+    }
+
+    .tracking-header {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .tracking-header h2 {
+        font-size: 1.1rem;
+        width: 100%;
+    }
+
+    .header-actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .card {
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .route-info-card {
+        flex-direction: column;
+    }
+
+    .route-number-big {
+        font-size: 1.8rem;
+    }
+
+    .status-details {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .tracking-layout {
+        height: auto;
+    }
+
+    .timeline-panel {
+        padding: 0.7rem 0.5rem;
+    }
+
+    #leafletMap {
+        flex: 0 0 280px;
+        height: 280px;
+    }
+
+    .tracking-header {
+        margin-bottom: 0.75rem;
+    }
+
+    .tracking-header h2 {
+        font-size: 1rem;
+    }
+
+    .tracking-header .header-left {
+        gap: 0.5rem;
+    }
+
+    .header-actions {
+        gap: 0.5rem;
+    }
+
+    .status-badge {
+        padding: 4px 8px;
+        font-size: 0.8rem;
+    }
+
+    .header-logout-btn {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+    }
+
+    .card {
+        padding: 0.85rem;
+        margin-bottom: 0.6rem;
+    }
+
+    .card-header {
+        font-size: 0.75rem;
+    }
+
+    .route-number-big {
+        font-size: 1.5rem;
+    }
+
+    .route-meta {
+        gap: 0.4rem;
+    }
+
+    .route-direction {
+        font-size: 0.9rem;
+    }
+
+    .status-row {
+        font-size: 1rem;
+    }
+
+    .passenger-stop-name {
+        font-size: 1.1rem;
+    }
+
+    .eta-time {
+        font-size: 1rem;
+    }
+
+    .timeline {
+        padding-left: 1.2rem;
+    }
+
+    .timeline-item {
+        margin-bottom: 1.2rem;
+    }
+
+    .back-btn {
+        font-size: 0.9rem;
+    }
+}
+
+.tracking-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+.tracking-header .header-left { display:flex; align-items:center; gap:12px; }
+.route-head { display:flex; flex-direction:column; }
+.route-short { font-weight:800; color:var(--primary); font-size:1.1rem; }
+.route-title-text { font-size:0.95rem; color:var(--text-secondary); }
+
+.header-actions { display:flex; align-items:center; gap:10px; margin-left:auto; }
+.status-badge { background:#ECFEFF; color:#0369A1; padding:6px 10px; border-radius:12px; font-weight:700; }
+.header-logout-btn { background:#ef4444; color:#fff; border:none; border-radius:8px; padding:8px 12px; cursor:pointer; font-weight:600; }
+.back-btn {
+    background: none;
+    border: none;
+    font-size: 1rem;
+    color: var(--primary);
+    cursor: pointer;
+    font-weight: 600;
+}
+.tracking-header h2 {
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+.card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+}
+.card-header {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-secondary);
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+}
+
+/* Route Info Card */
+.route-info-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+.route-number-big {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--primary);
+    min-width: 72px;
+}
+.route-meta { display:flex; flex-direction:column; gap:8px; }
+.route-properties { display:flex; flex-wrap:wrap; gap:8px; color:var(--text-secondary); font-size:0.9rem; }
+.route-properties .prop { background: #F8FAFF; padding:6px 8px; border-radius:8px; }
+.route-direction {
+    font-size: 1rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.arrow { color: var(--primary); }
+.direction-badge {
+    background: #FEF3C7;
+    color: #92400E;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-left: auto;
+}
+
+/* Status Card */
+.status-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+.status-indicator { font-size: 1.3rem; }
+.status-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+}
+
+/* Passenger ETA Card */
+.passenger-eta-card {
+    background: #EFF6FF;
+    border: 1px solid #BFDBFE;
+}
+.passenger-stop-name {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+.passenger-arrival {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+.eta-time {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+.passenger-destination {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+/* Timeline */
+.timeline {
+    position: relative;
+    padding-left: 1.5rem;
+    margin-top: 0.5rem;
+}
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 0.5rem;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--border);
+}
+.timeline-item {
+    position: relative;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+.timeline-dot {
+    position: absolute;
+    left: -0.65rem;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    background: white;
+    z-index: 1;
+}
+.timeline-dot.reached { background: var(--success); border-color: var(--success); }
+.timeline-dot.current { background: var(--success); border-color: var(--success); animation: pulse 1.5s infinite; }
+.timeline-dot.next { background: var(--warning); border-color: var(--warning); }
+.timeline-dot.pending { background: white; border-color: var(--border); }
+
+.timeline-content {
+    flex: 1;
+    padding-top: 0.15rem;
+}
+.timeline-content .stop-name {
+    font-weight: 600;
+    margin-bottom: 0.2rem;
+}
+.timeline-content .eta {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+.reached .stop-name { color: var(--success); }
+.current .stop-name { color: var(--success); font-weight: 700; }
+.next .stop-name { color: var(--warning); }
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(16,185,129,0.4); }
+    70% { box-shadow: 0 0 0 6px rgba(16,185,129,0); }
+    100% { box-shadow: 0 0 0 0 rgba(16,185,129,0); }
+}
+
+/* Map Panel */
+.map-panel {
+    flex: 1 1 60%;
+    min-width: 700px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--card-bg);
+    box-shadow: -2px 0 12px rgba(0,0,0,0.06);
+    z-index: 10;
+}
+.map-container {
+    flex: 1;
+    width: 100%;
+    min-height: 0; /* important for Firefox */
+    height: 100vh;
+}
+.map-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 1000;
+}
+.map-controls button {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 0.4rem 0.6rem;
+    box-shadow: var(--shadow-sm);
+    cursor: pointer;
+    font-size: 1.2rem;
+}
+
+/* Responsive: Mobile */
+@media (max-width: 1024px) {
+    .timeline-panel { flex: 0 0 45%; max-width: 45%; }
+    .map-panel { min-width: 420px; }
+}
+
+/* Responsive: Mobile */
+@media (max-width: 768px) {
+    .tracking-layout {
+        flex-direction: column;
+    }
+    .map-panel {
+        width: 100%;
+        height: 50vh;
+        position: relative;
+        order: 2;
+    }
+    .timeline-panel {
+        height: auto;
+        order: 1;
+        padding: 1rem;
+    }
+}
