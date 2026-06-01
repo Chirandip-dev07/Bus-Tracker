@@ -1,8 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const API_BASE = 'http://localhost:8000/api/passenger';
-    const token = localStorage.getItem('passengerToken');
-    const profileStr = localStorage.getItem('passengerProfile');
-    if (!token || !profileStr) { window.location.href = 'login.html'; return; }
+    const session = requireRoleSession('passenger');
+    if (!session) return;
+    const { token } = session;
 
     // Elements
     const sourceRadios = document.querySelectorAll('input[name="sourceType"]');
@@ -27,11 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Fetch all stops for autocomplete
     async function fetchStops() {
         try {
-            const res = await fetch(`${API_BASE}/stops`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (!res.ok) throw new Error('Failed to load stops');
-            allStops = await res.json();
+            allStops = await apiRequest('/api/passenger/stops', {}, { token, role: 'passenger' });
         } catch (err) {
             console.error(err);
         }
@@ -68,16 +63,13 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const lat = pos.coords.latitude;
                 const lng = pos.coords.longitude;
-                const res = await fetch(`${API_BASE}/nearest-stop`, {
+                const data = await apiRequest('/api/passenger/nearest-stop', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({ latitude: lat, longitude: lng })
-                });
-                if (!res.ok) throw new Error('Failed');
-                const data = await res.json();
+                }, { token, role: 'passenger' });
                 nearestStopName.textContent = data.stopName;
                 detectedSourceInput.value = data.stopName;
                 selectedSource = data.stopName;
@@ -159,15 +151,13 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             searchBtn.disabled = true;
             searchBtn.innerHTML = '<span class="spinner"></span> Searching...';
-            const res = await fetch(`${API_BASE}/search-routes`, {
+            const data = await apiRequest('/api/passenger/search-routes', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ source: selectedSource, destination: selectedDestination })
-            });
-            const data = await res.json();
+            }, { token, role: 'passenger' });
             if (data.error) {
                 searchError.textContent = data.error;
                 return;
@@ -244,11 +234,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             liveBusesContainer.innerHTML = '<p>Loading live buses...</p>';
             liveBusesModal.style.display = 'flex';
-            const res = await fetch(`${API_BASE}/live-buses?routeId=${route.routeId}&direction=${route.direction}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (!res.ok) throw new Error('Failed');
-            const buses = await res.json();
+            const buses = await apiRequest(`/api/passenger/live-buses?routeId=${route.routeId}&direction=${route.direction}`, {}, { token, role: 'passenger' });
             if (buses.length === 0) {
                 liveBusesContainer.innerHTML = '<p>No live buses currently available on this route.</p>';
                 return;

@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const token = localStorage.getItem('passengerToken');
-    const profileStr = localStorage.getItem('passengerProfile');
-    if (!token || !profileStr) { window.location.href = 'login.html'; return; }
+    const session = requireRoleSession('passenger');
+    if (!session) return;
+    const { token } = session;
 
     const params = new URLSearchParams(window.location.search);
     const routeId = params.get('routeId');
@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    const API_BASE = 'http://localhost:8000/api';
+    // API_BASE provided by config.js
     const backBtn = document.getElementById('backBtn');
     backBtn.addEventListener('click', () => window.location.href = 'passenger-dashboard.html');
 
@@ -23,12 +23,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function fetchSchedule() {
         try {
-            const res = await fetch(
-                `${API_BASE}/passenger/route-schedule?routeId=${routeId}&source=${encodeURIComponent(source)}&destination=${encodeURIComponent(destination)}&direction=${direction}`,
-                { headers: { 'Authorization': `Bearer ${token}` } }
+            const data = await apiRequest(
+                `/api/passenger/route-schedule?routeId=${routeId}&source=${encodeURIComponent(source)}&destination=${encodeURIComponent(destination)}&direction=${direction}`,
+                {},
+                { token, role: 'passenger' }
             );
-            if (!res.ok) throw new Error('Failed to load schedule');
-            const data = await res.json();
             renderSchedule(data);
         } catch (err) {
             scheduleContent.innerHTML = '<p class="error">Failed to load schedule. Please try again.</p>';

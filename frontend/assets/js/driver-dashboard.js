@@ -1,18 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const API_BASE = 'http://localhost:8000/api';
-    const token = localStorage.getItem('driverToken');
-    const userStr = localStorage.getItem('driverProfile');
-
-    if (!token || !userStr) {
-        window.location.href = 'login.html';
-        return;
-    }
-
-    const user = JSON.parse(userStr);
-    if (user.role !== 'driver') {
-        window.location.href = 'login.html';
-        return;
-    }
+    const session = requireRoleSession('driver');
+    if (!session) return;
+    const { token } = session;
 
     // ── Global state ──
     let activeTrip = null;        // trip object from API
@@ -67,8 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('logoutSidebar').addEventListener('click', () => {
-        localStorage.removeItem('driverToken');
-        localStorage.removeItem('driverProfile');
+        clearRoleSession('driver');
         window.location.href = 'login.html';
     });
 
@@ -83,28 +71,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ── API wrapper ──
     async function apiFetch(url, options = {}) {
-        const headers = { 'Authorization': `Bearer ${token}`, ...options.headers };
-        const res = await fetch(`${API_BASE}${url}`, { ...options, headers });
-        if (res.status === 401 || res.status === 403) {
-            alert('Session expired. Please login again.');
-            localStorage.removeItem('driverToken');
-            localStorage.removeItem('driverProfile');
-            window.location.href = 'login.html';
-            return null;
-        }
-        if (!res.ok) {
-            const err = await res.json().catch(() => ({ detail: 'Request failed' }));
-            throw new Error(err.detail || 'Request failed');
-        }
-        return res.json();
+        return apiRequest(`/api${url}`, options, { token, role: 'driver' });
     }
 
     // ── Driver profile & route data ──
     async function loadProfile() {
-        console.log("LOAD PROFILE START");
         try {
             const profile = await apiFetch('/driver/profile');
-            console.log("PROFILE RECEIVED", profile);
+            // profile received
             // Sidebar & header
             document.getElementById('sidebarName').textContent = profile.name;
             document.getElementById('headerName').textContent = profile.name;
@@ -153,9 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         route_number: assignedRoute.route_number || assignedRoute.routeNumber
                     };
                 }
-                console.log('ACTIVE TRIP:', activeTrip);
-                console.log('ROUTE:', activeTrip.route);
-                console.log('ROUTE NUMBER:', activeTrip.route?.routeNumber || activeTrip.route?.route_number);
+                // active trip present
                 document.getElementById('tripBadge').textContent = 'Trip Active';
                 updateHomeDirectionDisplay(activeTrip);
                 updateLiveStats(activeTrip);
@@ -170,7 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         document.getElementById('homeSkeleton').style.display = 'none';
         document.getElementById('homeContent').style.display = 'block';
-        console.log("LOAD PROFILE END");
+        // load profile finished
     }
 
     // ── Start Trip (with location validation) ──
@@ -232,9 +204,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     route_number: assignedRoute.route_number || assignedRoute.routeNumber
                 };
             }
-            console.log('ACTIVE TRIP START:', activeTrip);
-            console.log('ROUTE:', activeTrip.route);
-            console.log('ROUTE NUMBER:', activeTrip.route?.routeNumber);
+            // active trip started
             localStorage.setItem('activeTrip', JSON.stringify(activeTrip));
             document.getElementById('tripBadge').textContent = 'Trip Active';
             updateHomeDirectionDisplay(activeTrip);
@@ -282,7 +252,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ── Map & WebSocket setup ──
     function initMapAndWebSocket() {
-        console.log("INIT MAP");
+        // init map
 
         if (!activeTrip) return;
 
@@ -327,11 +297,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const marker = L.marker([stop.latitude, stop.longitude]).addTo(map).bindPopup(stop.name);
             stopMarkers.push(marker);
         });
-        console.log("ROUTE POLYLINE:", routePolyline);
-
-console.log("BOUNDS:", routePolyline.getBounds());
-
-console.log("MAP:", map);
+        // route polyline drawn
         const bounds = routePolyline.getBounds();
 
 if (bounds && bounds.isValid()) {
@@ -364,12 +330,11 @@ if (bounds && bounds.isValid()) {
 
     // ── WebSocket for GPS ──
     function startWebSocket() {
-        console.log("START WS");
         if (ws) ws.close();
-        ws = new WebSocket(
-            `ws://127.0.0.1:8000/api/driver/ws/gps?token=${token}`
-        );
-        ws.onopen = () => console.log('GPS WebSocket connected');
+        ws = new WebSocket(buildWsUrl(`/api/driver/ws/gps?token=${encodeURIComponent(token)}`));
+        ws.onopen = () => {
+            document.getElementById('headerStatus').textContent = 'Online';
+        };
         ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
             if (data.type === 'gps_update') {
@@ -399,8 +364,17 @@ if (bounds && bounds.isValid()) {
                 loadProfile();
             }
         };
-        ws.onerror = (e) => console.error('WebSocket error', e);
-        ws.onclose = () => console.log('GPS WebSocket closed');
+        ws.onerror = () => {
+            document.getElementById('headerStatus').textContent = 'Connection issue';
+        };
+        ws.onclose = () => {
+            document.getElementById('headerStatus').textContent = activeTrip ? 'Reconnecting...' : 'Offline';
+            if (activeTrip) {
+                setTimeout(() => {
+                    if (!ws || ws.readyState === WebSocket.CLOSED) startWebSocket();
+                }, 5000);
+            }
+        };
     }
 
     function renderStopProgress(etas, status) {
@@ -469,8 +443,7 @@ if (bounds && bounds.isValid()) {
 
     function startLiveDurationTimer(startedAt) {
         if (!startedAt) return;
-        console.log("STARTED AT:", startedAt);
-        console.log("CURRENT TIME:", new Date().toISOString());
+        // duration timer started
         if (durationInterval) clearInterval(durationInterval);
         document.getElementById('liveDuration').textContent = formatDuration(startedAt);
         durationInterval = setInterval(() => {
@@ -501,7 +474,9 @@ if (bounds && bounds.isValid()) {
                         timestamp: new Date().toISOString()
                     }));
                 }
-            }, err => console.warn('GPS error', err), { enableHighAccuracy: true, maximumAge: 2000 });
+            }, () => {
+                document.getElementById('headerStatus').textContent = 'GPS unavailable';
+            }, { enableHighAccuracy: true, maximumAge: 2000 });
         }, 5000);
     }
 
@@ -509,7 +484,9 @@ if (bounds && bounds.isValid()) {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
             pos => { driverLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude }; },
-            err => console.warn('Initial GPS failed', err),
+            () => {
+                document.getElementById('headerStatus').textContent = 'GPS unavailable';
+            },
             { enableHighAccuracy: true }
         );
     }

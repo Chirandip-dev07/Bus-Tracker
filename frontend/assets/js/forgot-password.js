@@ -26,8 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
     const autoRedirectTimer = document.getElementById('autoRedirectTimer');
 
-    // Backend base URL (same as login)
-    const API_BASE = 'http://localhost:8000/api/auth/forgot-password';
+    // Use API_BASE from config.js. Forgot-password endpoints are under /auth/forgot-password
 
     // Show a specific step
     function showStep(step) {
@@ -92,18 +91,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Backend communication with error handling
     async function apiCall(endpoint, body) {
-        try {
-            const res = await fetch(`${API_BASE}/${endpoint}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(body)
-            });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.detail || 'Request failed');
-            return data;
-        } catch (error) {
-            throw error;
-        }
+        return apiRequest(`/api/auth/forgot-password/${endpoint}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
     }
 
     // Step 1: Send OTP

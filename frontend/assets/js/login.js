@@ -66,25 +66,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // API call
     async function performLogin(identifier, password) {
-        const API_URL = 'http://localhost:8000/api/auth/login';  // Adjust if backend runs on different host/port
         try {
-            const response = await fetch(API_URL, {
+            return await apiRequest('/api/auth/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ identifier, password }),
             });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.detail || 'Login failed');
-            }
-
-            return data;
         } catch (error) {
-            console.error('Login error:', error);
+            console.error('Login error:', error.message || error);
             return { success: false, message: error.message || 'Network error. Please try again.' };
         }
     }

@@ -1,10 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const API_BASE = 'http://localhost:8000/api';
-    const token = localStorage.getItem('adminToken');
-    const userStr = localStorage.getItem('adminProfile');
-    if (!token || !userStr) { window.location.href = 'login.html'; return; }
-    const user = JSON.parse(userStr);
-    if (user.role !== 'admin') { window.location.href = 'login.html'; return; }
+    const session = requireRoleSession('admin');
+    if (!session) return;
+    const { token, profile: user } = session;
 
     // Set admin name
     document.getElementById('adminName').textContent = user.name;
@@ -34,27 +31,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Logout
     document.getElementById('logoutBtn').addEventListener('click', () => {
-        localStorage.removeItem('adminToken');
-        localStorage.removeItem('adminProfile');
+        clearRoleSession('admin');
         window.location.href = 'login.html';
     });
 
     // Fetch wrapper
     async function apiFetch(url, options = {}) {
-        const headers = { 'Authorization': `Bearer ${token}`, ...options.headers };
-        const res = await fetch(`${API_BASE}${url}`, { ...options, headers });
-        if (res.status === 401 || res.status === 403) {
-            alert('Session expired or unauthorized');
-            localStorage.removeItem('adminToken');
-            localStorage.removeItem('adminProfile');
-            window.location.href = 'login.html';
-            return null;
-        }
-        if (!res.ok) {
-            const err = await res.json().catch(() => ({ detail: 'Error' }));
-            throw new Error(err.detail || 'Request failed');
-        }
-        return res.json();
+        return apiRequest(`/api${url}`, options, { token, role: 'admin' });
     }
 
     // Load section content

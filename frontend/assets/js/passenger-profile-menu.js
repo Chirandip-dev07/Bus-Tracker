@@ -1,10 +1,10 @@
 (function() {
-    const token = localStorage.getItem('passengerToken');
-    const userStr = localStorage.getItem('passengerProfile');
-    if (!token || !userStr) return;
-    let user;
-    try { user = JSON.parse(userStr); } catch (e) { return; }
-    if (user.role !== 'passenger') return;
+    const session = getStoredSession('passenger');
+    if (!session || session.profile.role !== 'passenger' || isJwtExpired(session.token)) {
+        clearRoleSession('passenger');
+        return;
+    }
+    const { token } = session;
 
     const header = document.querySelector('header');
     if (!header) return;
@@ -39,14 +39,7 @@
     const topLogoutBtn = document.getElementById('logoutBtn');
     if (topLogoutBtn) {
         topLogoutBtn.addEventListener('click', () => {
-            // Remove only passenger-specific session entries
-            try {
-                localStorage.removeItem('passengerToken');
-                localStorage.removeItem('passengerProfile');
-            } catch (e) {
-                console.warn('Logout cleanup failed', e);
-            }
-            // Redirect to passenger login
+            clearRoleSession('passenger');
             window.location.href = 'login.html';
         });
     }
@@ -57,11 +50,8 @@
     // ── Fetch profile from API ──
     async function fetchAndRenderProfile() {
         try {
-            const res = await fetch('http://localhost:8000/api/passenger/profile', {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (!res.ok) throw new Error('Failed to fetch profile');
-            const data = await res.json();
+            const data = await apiRequest('/api/passenger/profile', {}, { token, role: 'passenger' });
+            if (!data) return;
 
             // Compute initials from name
             const name = data.name || '';
@@ -90,8 +80,7 @@
                 document.getElementById('memberSince').textContent = '';
             }
         } catch (err) {
-            console.warn('Profile fetch error:', err);
-            // Keep existing UI as fallback
+            // profile fetch failed - keep UI fallback
         }
     }
 

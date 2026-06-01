@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const token = localStorage.getItem('passengerToken');
-    const profileStr = localStorage.getItem('passengerProfile');
-    if (!token || !profileStr) { window.location.href = 'login.html'; return; }
+    const session = requireRoleSession('passenger');
+    if (!session) return;
+    const { token } = session;
 
     const params = new URLSearchParams(window.location.search);
     const tripId = params.get('tripId');
@@ -12,11 +12,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const passengerSource = localStorage.getItem('passengerSource') || '';
     const passengerDestination = localStorage.getItem('passengerDestination') || '';
 
-    const API_BASE = 'http://localhost:8000/api';
+    // Use API_BASE from config.js
     let map, busMarker, passengerMarker, routePolyline;
     let routeStops = [];
     let liveBusData = null;
     let currentRoute = null;
+    let pageIsUnloading = false;
 
     const backBtn = document.getElementById('backBtn');
     backBtn.addEventListener('click', () => window.location.href = 'passenger-dashboard.html');
@@ -32,11 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ── Fetch initial live bus data ──
     async function fetchLiveBusData() {
         try {
-            const res = await fetch(`${API_BASE}/passenger/live-bus/${tripId}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (!res.ok) throw new Error('Live bus not found');
-            liveBusData = await res.json();
+            liveBusData = await apiRequest(`/api/passenger/live-bus/${tripId}`, {}, { token, role: 'passenger' });
             return liveBusData;
         } catch (err) {
             alert('This bus is no longer active.');
@@ -48,10 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ── Load route and draw map ──
     async function loadRouteData() {
         try {
-            const res = await fetch(`${API_BASE}/routes`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            const routes = await res.json();
+            const routes = await apiRequest('/api/routes', {}, { token, role: 'passenger' });
             const route = routes.find(r => r._id === routeId);
             if (!route || !route.stops) throw new Error('Route not found');
             routeStops = route.stops;
@@ -65,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Ensure the map redraws correctly after layout changes
             setTimeout(() => { try { map.invalidateSize(); } catch(e){} }, 250);
         } catch (err) {
-            console.error('Failed to load route', err);
+            document.getElementById('timelineContainer').innerHTML = '<div class="error">Unable to load route details.</div>';
         }
     }
 
@@ -194,7 +188,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ── WebSocket (real‑time updates) ──
     function connectWebSocket() {
-        const ws = new WebSocket(`ws://localhost:8000/api/passenger/ws/trip/${tripId}?token=${token}`);
+        const ws = new WebSocket(buildWsUrl(`/api/passenger/ws/trip/${tripId}?token=${encodeURIComponent(token)}`));
+        ws.onopen = () => {
+            const statusBadge = document.getElementById('statusBadge');
+            if (statusBadge && statusBadge.textContent === 'Connection issue') statusBadge.textContent = liveBusData?.status || '--';
+        };
         ws.onmessage = (event) => {
             const msg = JSON.parse(event.data);
             if (msg.type === 'gps_update') {
@@ -223,7 +221,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.location.href = 'passenger-dashboard.html';
             }
         };
-        ws.onerror = (e) => console.error('WebSocket error', e);
+        ws.onerror = () => {
+            const statusBadge = document.getElementById('statusBadge');
+            if (statusBadge) statusBadge.textContent = 'Connection issue';
+        };
+        ws.onclose = () => {
+            if (pageIsUnloading) return;
+            const statusBadge = document.getElementById('statusBadge');
+            if (statusBadge) statusBadge.textContent = 'Reconnecting...';
+            setTimeout(connectWebSocket, 5000);
+        };
         return ws;
     }
 
@@ -267,7 +274,10 @@ document.addEventListener('DOMContentLoaded', () => {
     Promise.all([loadRouteData(), fetchLiveBusData()]).then(([_, data]) => {
         populateUI(data);
         const ws = connectWebSocket();
-        window.addEventListener('beforeunload', () => ws.close());
+        window.addEventListener('beforeunload', () => {
+            pageIsUnloading = true;
+            ws.close();
+        });
     });
     requestPassengerLocation();
 });

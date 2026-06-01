@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Backend base URL
-    const API_BASE = 'http://localhost:8000/api/auth/register';
+    // Use `API_BASE` from config.js. Registration endpoints are under /auth/register on the backend.
 
     // State
     let userData = {
@@ -119,8 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Fetch routes
     async function loadRoutes() {
         try {
-            const res = await fetch('http://localhost:8000/api/routes');
-            const routes = await res.json();
+            const routes = await apiRequest('/api/routes');
             routeSelect.innerHTML = '<option value="">-- Choose a route --</option>';
             routes.forEach(r => {
                 const opt = document.createElement('option');
@@ -129,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 routeSelect.appendChild(opt);
             });
         } catch (err) {
-            console.error('Failed to load routes', err);
+            routeSelect.innerHTML = '<option value="">Routes unavailable</option>';
         }
     }
     loadRoutes();
@@ -142,8 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         try {
-            const res = await fetch('http://localhost:8000/api/routes');
-            const routes = await res.json();
+            const routes = await apiRequest('/api/routes');
             const route = routes.find(r => r._id === routeId);
             if (route) {
                 routeInfoCard.innerHTML = `
@@ -156,7 +153,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 routeInfoCard.style.display = 'block';
             }
         } catch (err) {
-            console.error(err);
+            routeInfoCard.innerHTML = '<p>Unable to load route details.</p>';
+            routeInfoCard.style.display = 'block';
         }
     });
 
@@ -243,51 +241,35 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function sendEmailOtp() {
-        try {
-            const res = await fetch(`${API_BASE}/send-email-otp`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ email: userData.email, phone: userData.phone })
-            });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.detail || 'Failed to send OTP');
-        } catch (err) {
-            throw err;
-        }
+        await apiRequest('/api/auth/register/send-email-otp', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ email: userData.email, phone: userData.phone })
+        });
     }
 
     async function sendPhoneOtp() {
-        try {
-            const res = await fetch(`${API_BASE}/send-phone-otp`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ phone: userData.phone, email: userData.email })
-            });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.detail || 'Failed to send OTP');
-        } catch (err) {
-            throw err;
-        }
+        await apiRequest('/api/auth/register/send-phone-otp', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ phone: userData.phone, email: userData.email })
+        });
     }
 
     async function verifyEmailOtp(otp) {
-        const res = await fetch(`${API_BASE}/verify-email-otp`, {
+        await apiRequest('/api/auth/register/verify-email-otp', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ email: userData.email, phone: userData.phone, otp })
         });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.detail || 'Verification failed');
     }
 
     async function verifyPhoneOtp(otp) {
-        const res = await fetch(`${API_BASE}/verify-phone-otp`, {
+        await apiRequest('/api/auth/register/verify-phone-otp', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ email: userData.email, phone: userData.phone, otp })
         });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.detail || 'Verification failed');
     }
 
     // Step 2: Send email OTP and move to step2
@@ -385,13 +367,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     phone: userData.phone,
                     password: userData.password
                 };
-                const res = await fetch(`${API_BASE}/passenger`, {
+                await apiRequest('/api/auth/register/passenger', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(payload)
                 });
-                const data = await res.json();
-                if (!res.ok) throw new Error(data.detail || 'Registration failed');
                 showStep(successPassenger);
                 startRedirect(3, 'passenger');
             } else {
@@ -406,13 +386,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     operator_name: userData.operator || null,
                     route_id: userData.routeId
                 };
-                const res = await fetch(`${API_BASE}/driver`, {
+                const data = await apiRequest('/api/auth/register/driver', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(payload)
                 });
-                const data = await res.json();
-                if (!res.ok) throw new Error(data.detail || 'Registration failed');
                 document.getElementById('appIdDisplay').textContent = data.application_id;
                 showStep(successDriver);
             }
