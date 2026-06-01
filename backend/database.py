@@ -2,7 +2,7 @@ import motor.motor_asyncio
 from pymongo.errors import ConnectionFailure
 from datetime import datetime
 
-MONGODB_URL = "mongodb+srv://ujjivana_app_user:yVbX52Ng6C07HhuY@cluster0.pxvwjdk.mongodb.net/bus_tracking_app?retryWrites=true&w=majority"
+MONGODB_URL = ""
 DATABASE_NAME = "bus_tracking_app"
 
 client = motor.motor_asyncio.AsyncIOMotorClient(MONGODB_URL)
